@@ -13,6 +13,7 @@ var resolve = require('path').resolve
   , jade = require('jade')
   , less = require('less-middleware')
   , url = require('url')
+  , send = require('send')
   , fs = require('fs');
 
 // CLI
@@ -33,6 +34,7 @@ program
   .option('-f, --favicon <path>', 'serve the given favicon')
   .option('-C, --cors', 'allows cross origin access serving')
   .option('    --compress', 'gzip or deflate the response')
+  .option('    --spa', 'Adds SPA support')
   .option('    --exec <cmd>', 'execute command on each request')
   .parse(process.argv);
 
@@ -126,6 +128,13 @@ if (program.dirs) {
       hidden: program.hidden
     , icons: program.icons
   }));
+}
+
+// spa serving
+if (program.spa) {
+  server.use(function(req, res, next) {
+    send(req, join(path, 'index.html')).pipe(res);
+  });
 }
 
 // start the server
